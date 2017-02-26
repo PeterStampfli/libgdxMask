@@ -13,7 +13,15 @@ public class MyGdxGame extends ApplicationAdapter {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+
+		Mask mask=new Mask(50,50);
+		mask.circle(20.5f,20,15);
+
+		img = mask.imageWhite();
+
+		img.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+		img.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
 	}
 
 	@Override
@@ -22,6 +30,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
 		batch.draw(img, 0, 0);
+		batch.draw(img, img.getWidth(), img.getHeight(),4*img.getWidth(),4*img.getHeight());
 		batch.end();
 	}
 	
