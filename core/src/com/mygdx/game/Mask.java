@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
 
 import java.nio.ByteBuffer;
 
@@ -15,15 +17,35 @@ public class Mask {
     private float[] alpha;        // 0 for transparent, 1 for opaque, additive, maybe outside this range
     private int width;
     private int height;
+    private int iMin, iMax, jMin, jMax;
+    // for shapes
+    FloatArray verticesX,verticesY;
+    Array<Line> lines;
 
     public Mask(int width,int height){
         this.width=width;
         this.height=height;
+        setLimits(1,1,width-2,height-2);
         alpha=new float[width*height];
         int length=alpha.length;
         for (int i=0;i<length;i++){
             alpha[i]=0f;
         }
+        setLimits();
+        verticesX=new FloatArray();
+        verticesY=new FloatArray();
+        lines=new Array<Line>();
+    }
+
+    public void setLimits(int iMin,int iMax,int jMin,int jMax){
+        this.iMin =MathUtils.clamp(iMin,0,width-1);
+        this.iMax =MathUtils.clamp(iMax,0,width-1);
+        this.jMin =MathUtils.clamp(jMin,0,height-1);
+        this.jMax =MathUtils.clamp(jMax,0,height-1);
+    }
+
+    public void setLimits(){
+        setLimits(Math.min(1,width-2),Math.max(width-2,1),Math.min(1,height-2),Math.max(1,height-2));
     }
 
     private byte byteOfFloat(float f){
@@ -53,12 +75,24 @@ public class Mask {
         return image(1,1,1);
     }
 
-    public void circle(float centerX,float centerY,float radius){
+    // fill rect area
+    public void fill(){
+        int i,j,jWidth;
+        for (j=jMin;j<=jMax;j++) {
+            jWidth = j * width;
+            for (i = iMin; i <= iMax; i++) {
+                alpha[i + jWidth] = 1;
+            }
+        }
+    }
+
+    // smooth full disc
+    public void disc(float centerX,float centerY,float radius){
         int iMax,iMin,jMax,jMin;
-        iMax=Math.min(width-1,MathUtils.ceil(centerX+radius));
-        iMin=Math.max(0,MathUtils.floor(centerX-radius));
-        jMax=Math.min(height-1,MathUtils.ceil(centerY+radius));
-        jMin=Math.max(0,MathUtils.floor(centerY-radius));
+        iMax=Math.min(this.iMax,MathUtils.ceil(centerX+radius));
+        iMin=Math.max(this.iMin,MathUtils.floor(centerX-radius));
+        jMax=Math.min(this.jMax,MathUtils.ceil(centerY+radius));
+        jMin=Math.max(this.jMin,MathUtils.floor(centerY-radius));
         int i,j,jWidth;
         float dx,dx2,dy,dy2,dx2Plusdy2;
         float radiusSq=radius*radius;
@@ -74,7 +108,7 @@ public class Mask {
                 dx2=dx*dx;
                 dx2Plusdy2=dy2+dx2;
                 if (dx2Plusdy2<radiusSqMinus){
-                    alpha[i+jWidth]+=1;
+                    alpha[i+jWidth]=1;
                 }
                 else if (dx2Plusdy2<radiusSqPlus){
                     if (dx>dy){
@@ -89,5 +123,76 @@ public class Mask {
         }
     }
 
+    // convex shapes
+    private class Line{
+        float pointX,pointY;
+        float slope;
+        boolean isHorizontal;
+        boolean increasing;
+
+        Line(float x1,float y1,float x2,float y2) {
+            pointX = x1;
+            pointY = y1;
+            isHorizontal = (Math.abs(x2 - x1) > Math.abs(y2 - y1));
+            if (isHorizontal){
+                increasing = (x2 > x1);
+                slope = (y2 - y1) / (x2 - x1);
+            }
+            else {
+                increasing=(y2>y1);
+                slope=(x2-x1)/(y2-y1);
+            }
+        }
+
+        public float distance(int i,int j){
+            float linePosition,d;
+            if (isHorizontal){
+                linePosition=pointY+slope*(i-pointX);
+                d=increasing?j-linePosition:linePosition-j;
+            }
+            else {
+                linePosition=pointX+slope*(j-pointY);
+                d=increasing?linePosition-i:i-linePosition;
+            }
+            return d+0.5f;
+        }
+    }
+
+    // a smooth convex shape
+    public Mask resetShapeVertices(){
+        verticesX.clear();
+        verticesY.clear();
+        return  this;
+    }
+
+    public Mask addShapeVertex(float x,float y){
+        verticesX.add(x);
+        verticesY.add(y);
+        return this;
+    }
+
+    public Mask makeShapeLines(){
+        lines.clear();
+        int length=verticesX.size;
+        for (int i=0;i<length-1;i++){
+            lines.add(new Line(verticesX.get(i),verticesY.get(i),verticesX.get(i+1),verticesY.get(i+1)));
+        }
+        lines.add(new Line(verticesX.get(length-1),verticesY.get(length-1),verticesX.get(0),verticesY.get(0)));
+        return this;
+    }
+
+    public void fillShape(){
+        int iMin=this.iMax+1;
+        int iMax=this.iMin-1;
+        int jMin=this.jMax+1;
+        int jMax=this.jMin-1;
+        int length=verticesX.size;
+        for (int i=0;i<length;i++){
+            iMin=Math.min(iMin,MathUtils.floor(verticesX.get(i)));
+
+        }
+        iMin=Math.max(iMin,this.iMin);
+
+    }
 
 }

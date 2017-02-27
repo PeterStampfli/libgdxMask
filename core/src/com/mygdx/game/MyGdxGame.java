@@ -15,7 +15,15 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch = new SpriteBatch();
 
 		Mask mask=new Mask(50,50);
-		mask.circle(20.5f,20,15);
+		mask.setLimits(1,48,1,48);
+		//mask.disc(20.5f,20,25);
+		mask.setLimits();
+
+		mask.fill();
+		mask.resetShapeVertices();
+
+		mask.addShapeVertex(10,10).addShapeVertex(40,15).addShapeVertex(25,45);
+		mask.makeShapeLines();
 
 		img = mask.imageWhite();
 
