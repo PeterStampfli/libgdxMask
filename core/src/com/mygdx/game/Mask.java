@@ -31,7 +31,10 @@ public class Mask {
         for (int i=0;i<length;i++){
             alpha[i]=0f;
         }
-        setLimits();
+        iMin=0;
+        iMax=width-1;
+        jMin=0;
+        jMax=height-1;
         verticesX=new FloatArray();
         verticesY=new FloatArray();
         lines=new Array<Line>();
@@ -189,10 +192,44 @@ public class Mask {
         int length=verticesX.size;
         for (int i=0;i<length;i++){
             iMin=Math.min(iMin,MathUtils.floor(verticesX.get(i)));
-
+            iMax=Math.max(iMax,MathUtils.ceil(verticesX.get(i)));
+            jMin=Math.min(jMin,MathUtils.floor(verticesY.get(i)));
+            jMax=Math.max(jMax,MathUtils.ceil(verticesY.get(i)));
         }
         iMin=Math.max(iMin,this.iMin);
-
+        iMax=Math.min(iMax,this.iMax);
+        jMin=Math.max(jMin,this.jMin);
+        jMax=Math.min(jMax,this.jMax);
+        int i,j,jWidth;
+        float d;
+        length=lines.size;
+        for (j=jMin;j<=jMax;j++){
+            jWidth=j*width;
+            for (i=iMin;i<=iMax;i++){
+                d=1f;
+                for (Line line:lines){
+                    d=Math.min(d,line.distance(i,j));
+                    if (d<0) {
+                        break;
+                    }
+                }
+                if (d>0) {
+                    alpha[i+jWidth]+=d;
+                    //alpha[i+jWidth]+=1;
+                }
+            }
+        }
     }
 
+    public void fillShape(float... coordinates){
+        resetShapeVertices();
+        int length=coordinates.length;
+        for (int i=0;i<length;i+=2){
+            addShapeVertex(coordinates[i],coordinates[i+1]);
+        }
+        makeShapeLines();
+        fillShape();
+    }
 }
+
+

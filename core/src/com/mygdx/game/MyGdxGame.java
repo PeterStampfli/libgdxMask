@@ -19,11 +19,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		//mask.disc(20.5f,20,25);
 		mask.setLimits();
 
-		mask.fill();
-		mask.resetShapeVertices();
+		//mask.fill();
 
-		mask.addShapeVertex(10,10).addShapeVertex(40,15).addShapeVertex(25,45);
-		mask.makeShapeLines();
+		mask.fillShape(10,10,40,20,30,49);
+		mask.fillShape(40,20,40,40,30,49);
 
 		img = mask.imageWhite();
 
