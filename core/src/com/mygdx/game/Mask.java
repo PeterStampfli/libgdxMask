@@ -1,22 +1,17 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
-
-import java.nio.ByteBuffer;
 
 /**
  * Created by peter on 2/26/17.
  */
 
 public class Mask {
-    private float[] alpha;        // 0 for transparent, 1 for opaque, additive, maybe outside this range
-    private int width;
-    private int height;
+    public float[] alpha;        // 0 for transparent, 1 for opaque, additive, maybe outside this range
+    public int width;
+    public int height;
     private int iMin, iMax, jMin, jMax;
     // for shapes
     FloatArray verticesX,verticesY;
@@ -27,10 +22,7 @@ public class Mask {
         this.height=height;
         setLimits(1,1,width-2,height-2);
         alpha=new float[width*height];
-        int length=alpha.length;
-        for (int i=0;i<length;i++){
-            alpha[i]=0f;
-        }
+        clear();
         iMin=0;
         iMax=width-1;
         jMin=0;
@@ -38,6 +30,14 @@ public class Mask {
         verticesX=new FloatArray();
         verticesY=new FloatArray();
         lines=new Array<Line>();
+    }
+
+    public Mask clear(){
+        int length=alpha.length;
+        for (int i=0;i<length;i++){
+            alpha[i]=0f;
+        }
+        return this;
     }
 
     public void setLimits(int iMin,int iMax,int jMin,int jMax){
@@ -51,31 +51,12 @@ public class Mask {
         setLimits(Math.min(1,width-2),Math.max(width-2,1),Math.min(1,height-2),Math.max(1,height-2));
     }
 
-    private byte byteOfFloat(float f){
-        return (byte) Math.floor(MathUtils.clamp(f,0,0.99)*255);
-    }
-
-    public Texture image(float r,float g,float b){
-        Pixmap pixmap=new Pixmap(width,height, Pixmap.Format.RGBA8888);
-        pixmap.setColor(r,g,b,0f);
-        pixmap.fill();
-        ByteBuffer pixels=pixmap.getPixels();
-        int size=alpha.length;
-        for (int i=0;i<size;i++){
-            pixels.put(i*4+3,byteOfFloat(alpha[i]));
+    public Mask invert(){
+        int length=alpha.length;
+        for (int i=0;i<length;i++){
+            alpha[i]=1f-alpha[i];
         }
-        pixels.rewind();
-        Texture result=new Texture(pixmap);
-        pixmap.dispose();
-        return result;
-    }
-
-    public Texture image(Color color){
-        return image(color.r,color.g,color.b);
-    }
-
-    public Texture imageWhite(){
-        return image(1,1,1);
+        return this;
     }
 
     // fill rect area
