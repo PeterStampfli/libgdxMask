@@ -40,6 +40,13 @@ public class DotsAndLines {
         lineEndB.add(addPoint(x2,y2));
     }
 
+    public void addLines(float... coordinates){
+        int length=coordinates.length-2;
+        for (int i=0;i<length;i+=2){
+            addLine(coordinates[i],coordinates[i+1],coordinates[i+2],coordinates[i+3]);
+        }
+    }
+
     public void mask(Mask mask){
         for (Vector2 point:points){
             mask.disc(point.x,point.y,halfWidth);

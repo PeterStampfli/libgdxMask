@@ -19,7 +19,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		FileHandle bad=Gdx.files.internal("badlogic.jpg");
 
 		Mask mask;
-		RGBAPixmap rgba=new RGBAPixmap(150,150);
+		RGBAPixmap rgba=new RGBAPixmap(100,100);
 		mask=rgba.createMask();
 
 		rgba.setColor(Color.WHITE);
@@ -35,9 +35,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		//mask.invert();
 
 		DotsAndLines dotsAndLines=new DotsAndLines(10f);
-		dotsAndLines.addLine(15,15f,130,15f);
-		dotsAndLines.addLine(15,15,15,120);
-		dotsAndLines.addLine(15,80,130,15);
+		dotsAndLines.addLines(15,15f,100,15f,80,80,70,20,50,10);
+
 
 		dotsAndLines.mask(mask);
 		//mask.fillLine(200,10,10,100,10);
