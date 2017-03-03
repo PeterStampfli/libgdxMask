@@ -14,8 +14,8 @@ public class Mask {
     public int height;
     private int iMin, iMax, jMin, jMax;
     // for shapes
-    FloatArray verticesX,verticesY;
-    Array<Line> lines;
+    private FloatArray verticesX,verticesY;
+    private Array<Line> lines;
 
     public Mask(int width,int height){
         this.width=width;
@@ -60,7 +60,7 @@ public class Mask {
     }
 
     // fill rect area
-    public void fill(){
+    public void fillLimits(){
         int i,j,jWidth;
         for (j=jMin;j<=jMax;j++) {
             jWidth = j * width;
@@ -101,7 +101,9 @@ public class Mask {
                     else {
                         d=(float) Math.sqrt(radiusSq-dx2)-dy+0.5f;
                     }
-                    if (d>0) alpha[i + jWidth] += d;
+                    if (d>0) {
+                        alpha[i+jWidth]=Math.max(alpha[i+jWidth],d);
+                    }
                 }
             }
         }
@@ -195,8 +197,7 @@ public class Mask {
                     }
                 }
                 if (d>0) {
-                    alpha[i+jWidth]+=d;
-                    //alpha[i+jWidth]+=1;
+                    alpha[i+jWidth]=Math.max(alpha[i+jWidth],d);
                 }
             }
         }
@@ -210,6 +211,14 @@ public class Mask {
         }
         makeShapeLines();
         fillShape();
+    }
+
+    public void fillLine(float x1,float y1,float x2,float y2,float halfWidth){
+        float length=(float) Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+        float ex=(x2-x1)/length*halfWidth;
+        float ey=(y2-y1)/length*halfWidth;
+        fillShape(x1+ey,y1-ex,x2+ey,y2-ex,x2-ey,y2+ex,x1-ey,y1+ex);
+
     }
 }
 

@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,18 +19,28 @@ public class MyGdxGame extends ApplicationAdapter {
 		FileHandle bad=Gdx.files.internal("badlogic.jpg");
 
 		Mask mask;
-		RGBAPixmap rgba=RGBAPixmap.create("badlogic.jpg");
+		RGBAPixmap rgba=new RGBAPixmap(150,150);
 		mask=rgba.createMask();
 
+		rgba.setColor(Color.WHITE);
+		rgba.fill();
 		//mask.setLimits(1,48,1,48);
-		//mask.disc(20.5f,20,25);
+		//mask.disc(20f,20f,10);
+		//mask.fillLine(20f,20f,20,40,10);
 		//mask.setLimits();
+		//mask.fillLimits();
 
-		//mask.fill();
-
-		mask.fillShape(10,10,40,20,30,49);
-		mask.fillShape(40,20,140,40,30,249,30,49);
+		//mask.fillShape(10,10,40,20,30,49);
+		//mask.fillShape(40,20,140,40,30,249,30,49);
 		//mask.invert();
+
+		DotsAndLines dotsAndLines=new DotsAndLines(10f);
+		dotsAndLines.addLine(15,15f,130,15f);
+		dotsAndLines.addLine(15,15,15,120);
+		dotsAndLines.addLine(15,80,130,15);
+
+		dotsAndLines.mask(mask);
+		//mask.fillLine(200,10,10,100,10);
 		rgba.setAlpha(mask);
 
 
