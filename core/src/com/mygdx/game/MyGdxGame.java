@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.FloatArray;
 
 public class MyGdxGame extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -35,9 +36,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		//mask.invert();
 
 		DotsAndLines dotsAndLines=new DotsAndLines(10f);
-		dotsAndLines.addLines(15,15f,100,15f,80,80,70,20,50,10);
+		//dotsAndLines.addLines(15,15f,100,15f,80,80,70,20,50,10);
 
-
+		FloatArray dots=CircleToLines.aBCenter(10,10,40,10,25,30,false);
+		dotsAndLines.addLines(dots);
 		dotsAndLines.mask(mask);
 		//mask.fillLine(200,10,10,100,10);
 		rgba.setAlpha(mask);

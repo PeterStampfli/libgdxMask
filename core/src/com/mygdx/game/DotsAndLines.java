@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
 
 /**
@@ -44,6 +45,13 @@ public class DotsAndLines {
         int length=coordinates.length-2;
         for (int i=0;i<length;i+=2){
             addLine(coordinates[i],coordinates[i+1],coordinates[i+2],coordinates[i+3]);
+        }
+    }
+
+    public void addLines(FloatArray coordinates){
+        int length=coordinates.size-2;
+        for (int i=0;i<length;i+=2){
+            addLine(coordinates.get(i),coordinates.get(i+1),coordinates.get(i+2),coordinates.get(i+3));
         }
     }
 
