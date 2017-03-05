@@ -7,7 +7,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class MyGdxGame extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -20,7 +21,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		FileHandle bad=Gdx.files.internal("badlogic.jpg");
 
 		Mask mask;
-		RGBAPixmap rgba=new RGBAPixmap(100,100);
+		RGBAPixmap rgba=new RGBAPixmap(50,50);
 		mask=rgba.createMask();
 
 		rgba.setColor(Color.WHITE);
@@ -38,7 +39,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		DotsAndLines dotsAndLines=new DotsAndLines(10f);
 		//dotsAndLines.addLines(15,15f,100,15f,80,80,70,20,50,10);
 
-		FloatArray dots=CircleToLines.aBCenter(10,10,40,10,25,30,false);
+		Array<Vector2> dots=CircleToLines.aBC(10,25,25,40,40,25);
 		dotsAndLines.addLines(dots);
 		dotsAndLines.mask(mask);
 		//mask.fillLine(200,10,10,100,10);

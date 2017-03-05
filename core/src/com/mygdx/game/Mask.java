@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 
@@ -9,7 +10,7 @@ import com.badlogic.gdx.utils.FloatArray;
  */
 
 public class Mask {
-    public float[] alpha;        // 0 for transparent, 1 for opaque, additive, maybe outside this range
+    public float[] alpha;        // 0 for transparent, 1 for opaque
     public int width;
     public int height;
     private int iMin, iMax, jMin, jMax;
@@ -213,13 +214,26 @@ public class Mask {
         fillShape();
     }
 
+    public void fillShape(Array<Vector2> points){
+        resetShapeVertices();
+        for (Vector2 point:points){
+            addShapeVertex(point.x,point.y);
+        }
+        makeShapeLines();
+        fillShape();
+    }
+
     public void fillLine(float x1,float y1,float x2,float y2,float halfWidth){
         float length=(float) Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
         float ex=(x2-x1)/length*halfWidth;
         float ey=(y2-y1)/length*halfWidth;
         fillShape(x1+ey,y1-ex,x2+ey,y2-ex,x2-ey,y2+ex,x1-ey,y1+ex);
-
     }
+
+    public void fillLine(Vector2 a,Vector2 b,float halfWidth){
+        fillLine(a.x,a.y,b.x,b.y,halfWidth);
+    }
+
 }
 
 

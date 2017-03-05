@@ -36,9 +36,23 @@ public class DotsAndLines {
         return length;
     }
 
+    private int addPoint(Vector2 point){
+        int length=points.size;
+        for (int i=0;i<length;i++){
+            if (points.get(i).epsilonEquals(point,epsilon)) return i;
+        }
+        points.add(point);
+        return length;
+    }
+
     public void addLine(float x1,float y1,float x2,float y2){
         lineEndA.add(addPoint(x1,y1));
         lineEndB.add(addPoint(x2,y2));
+    }
+
+    public void addLine(Vector2 a,Vector2 b){
+        lineEndA.add(addPoint(a));
+        lineEndB.add(addPoint(b));
     }
 
     public void addLines(float... coordinates){
@@ -52,6 +66,13 @@ public class DotsAndLines {
         int length=coordinates.size-2;
         for (int i=0;i<length;i+=2){
             addLine(coordinates.get(i),coordinates.get(i+1),coordinates.get(i+2),coordinates.get(i+3));
+        }
+    }
+
+    public void addLines(Array<Vector2> points){
+        int length=points.size-1;
+        for (int i=0;i<length;i+=2){
+            addLine(points.get(i),points.get(i+1));
         }
     }
 

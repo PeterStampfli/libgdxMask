@@ -39,19 +39,10 @@ public class RGBAPixmap extends Pixmap {
 
     public void setAlpha(Mask mask){
         ByteBuffer pixels=this.getPixels();
-        Gdx.app.log("",""+pixels.toString());
-
         int size=mask.alpha.length;
-        Gdx.app.log("s",""+size);
-
         for (int i=0;i<size;i++){
             pixels.put(i*4+3,byteOfFloat(mask.alpha[i]));
         }
         pixels.rewind();
-
     }
-
-
-
-
 }
