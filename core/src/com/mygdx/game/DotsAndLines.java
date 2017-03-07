@@ -1,9 +1,9 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.IntArray;
 
 /**
  * Created by peter on 3/3/17.
@@ -11,62 +11,63 @@ import com.badlogic.gdx.utils.IntArray;
 
 public class DotsAndLines {
     Array<Vector2> points;
-    IntArray lineEndA,lineEndB;
-    float halfWidth;
+    Array<Line> lines;
     float epsilon;
+    float maxDeltaAngle=0.1f;
 
-    public DotsAndLines(float width,float epsilon){
-        halfWidth=0.5f*width;
+
+
+    public DotsAndLines(float epsilon){
         this.epsilon=epsilon;
         points=new Array<Vector2>();
-        lineEndA=new IntArray();
-        lineEndB=new IntArray();
+        lines=new Array<Line>();
     }
 
-    public DotsAndLines(float width){
-        this(width,0.01f);
+    public DotsAndLines(){
+        this(0.01f);
     }
 
-    private int addPoint(float x,float y){
+    public void drawDotsAndLines(Mask mask,float width){
+        float halfWidth=0.5f*width;
+        for (Vector2 point:points){
+            mask.disc(point,halfWidth);
+        }
+        for (Line line:lines){
+            mask.fillLine(line.a,line.b,halfWidth);
+        }
+    }
+
+    public void fillShape(Mask mask){
+        mask.fillShape(points);
+    }
+
+    private class Line{
+        Vector2 a;
+        Vector2 b;
+
+        public Line(Vector2 a,Vector2 b){
+            this.a=a;
+            this.b=b;
+        }
+    }
+
+    private void addPoint(Vector2 p){
         int length=points.size;
         for (int i=0;i<length;i++){
-            if (points.get(i).epsilonEquals(x,y,epsilon)) return i;
+            if (points.get(i).epsilonEquals(p,epsilon)) return ;
         }
-        points.add(new Vector2(x,y));
-        return length;
+        points.add(p);
     }
 
-    private int addPoint(Vector2 point){
-        int length=points.size;
-        for (int i=0;i<length;i++){
-            if (points.get(i).epsilonEquals(point,epsilon)) return i;
-        }
-        points.add(point);
-        return length;
-    }
-
-    public void addLine(float x1,float y1,float x2,float y2){
-        lineEndA.add(addPoint(x1,y1));
-        lineEndB.add(addPoint(x2,y2));
+    public void addLineTo(Vector2 p){
+        lines.add(new Line(points.peek(),p));
+        addPoint(p);
     }
 
     public void addLine(Vector2 a,Vector2 b){
-        lineEndA.add(addPoint(a));
-        lineEndB.add(addPoint(b));
-    }
-
-    public void addLines(float... coordinates){
-        int length=coordinates.length-2;
-        for (int i=0;i<length;i+=2){
-            addLine(coordinates[i],coordinates[i+1],coordinates[i+2],coordinates[i+3]);
-        }
-    }
-
-    public void addLines(FloatArray coordinates){
-        int length=coordinates.size-2;
-        for (int i=0;i<length;i+=2){
-            addLine(coordinates.get(i),coordinates.get(i+1),coordinates.get(i+2),coordinates.get(i+3));
-        }
+        addPoint(a);
+        addPoint(b);
+        lines.add(new Line(a,b));
     }
 
     public void addLines(Array<Vector2> points){
@@ -76,16 +77,53 @@ public class DotsAndLines {
         }
     }
 
-    public void mask(Mask mask){
-        for (Vector2 point:points){
-            mask.disc(point.x,point.y,halfWidth);
-        }
-        Vector2 a,b;
-        int length=lineEndA.size;
-        for (int i=0;i<length;i++){
-            a=points.get(lineEndA.get(i));
-            b=points.get(lineEndB.get(i));
-            mask.fillLine(a.x,a.y,b.x,b.y,halfWidth);
+    public void addLines(float... coordinates){
+        int length=coordinates.length-2;
+        for (int i=0;i<length;i+=2){
+            addLine(new Vector2(coordinates[i],coordinates[i+1]),new Vector2(coordinates[i+2],coordinates[i+3]));
         }
     }
+
+    // creating circle points around center(X,Y) with radius
+    //  from angle alpha to beta
+    //  counterClockwise determines sense (independent of cut at angle=+/-PI)
+    public void addBasicArc(float centerX, float centerY, float radius,
+                                       float alpha, float beta, boolean counterClockwise) {
+        if (counterClockwise) {
+            if (beta < alpha) {
+                beta += MathUtils.PI2;
+            }
+        } else {
+            if (beta > alpha) {
+                beta -= MathUtils.PI2;
+            }
+        }
+        int nSegments=MathUtils.ceil(Math.abs(beta-alpha)/maxDeltaAngle);
+        Gdx.app.log("nseg",""+nSegments);
+        float deltaAngle=(beta-alpha)/nSegments;
+        float angle=alpha;
+        Vector2 lastPoint=new Vector2(centerX+radius*MathUtils.cos(alpha),
+                                        centerY+radius*MathUtils.sin(alpha));
+        Vector2 nextPoint;
+        for (int i=0;i<=nSegments;i++){
+            nextPoint=new Vector2(centerX+radius*MathUtils.cos(angle),
+                                    centerY+radius*MathUtils.sin(angle));
+            angle+=deltaAngle;
+            addLine(lastPoint,nextPoint);
+            lastPoint=nextPoint;
+        }
+    }
+
+    public void addABSomeCenter(Vector2 a,Vector2 b,Vector2 someCenter,boolean counterclockwise){
+        Vector2 unitACenter=new Vector2(someCenter).sub(a);
+        unitACenter.scl(1f/unitACenter.len());
+        Vector2 aB=new Vector2(b).sub(a);
+        float radius=0.5f*aB.len2()/aB.dot(unitACenter);
+        Vector2 center=new Vector2(a).mulAdd(unitACenter,radius);
+        float alpha=MathUtils.atan2(a.y-center.y,a.x-center.x);
+        float beta=MathUtils.atan2(b.y-center.y,b.x-center.x);
+        addBasicArc(center.x,center.y,radius,alpha,beta,counterclockwise);
+    }
+
+
 }

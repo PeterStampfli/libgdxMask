@@ -5,10 +5,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 
 public class MyGdxGame extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -21,29 +21,33 @@ public class MyGdxGame extends ApplicationAdapter {
 		FileHandle bad=Gdx.files.internal("badlogic.jpg");
 
 		Mask mask;
-		RGBAPixmap rgba=new RGBAPixmap(50,50);
-		mask=rgba.createMask();
+		mask=new Mask(100,100);
 
+		Pixmap rgba=mask.createPixmap();
 		rgba.setColor(Color.WHITE);
 		rgba.fill();
 		//mask.setLimits(1,48,1,48);
-		//mask.disc(20f,20f,10);
+	//	mask.disc(20f,40f,10);
 		//mask.fillLine(20f,20f,20,40,10);
 		//mask.setLimits();
-		//mask.fillLimits();
 
-		//mask.fillShape(10,10,40,20,30,49);
+		//mask.fillShape(10,10,40,20,30,49,-10,20);
 		//mask.fillShape(40,20,140,40,30,249,30,49);
-		//mask.invert();
+		//mask.invertLimits();
 
-		DotsAndLines dotsAndLines=new DotsAndLines(10f);
-		//dotsAndLines.addLines(15,15f,100,15f,80,80,70,20,50,10);
+		//mask.fillLine(2,2,49,40,6);
+		DotsAndLines dotsAndLines=new DotsAndLines();
+		//dotsAndLines.addLines(15,15f,100,15f,80,80,70,90,20,30);
+		Vector2 a=new Vector2(10,50);
+		Vector2 b=new Vector2(90,50);
+		Vector2 center=new Vector2(100,140);
 
-		Array<Vector2> dots=CircleToLines.aBC(10,25,25,40,40,25);
-		dotsAndLines.addLines(dots);
-		dotsAndLines.mask(mask);
+		dotsAndLines.addABSomeCenter(a,b,center,true);
+		//dotsAndLines.addBasicArc(50,50,20,0,2.3f,true);
+		dotsAndLines.drawDotsAndLines(mask,6);
+		//dotsAndLines.fillShape(mask);
 		//mask.fillLine(200,10,10,100,10);
-		rgba.setAlpha(mask);
+		mask.setPixmapAlpha(rgba);
 
 
 		img = new Texture(rgba);
@@ -51,6 +55,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		img.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 		img.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
 
 	}
 
