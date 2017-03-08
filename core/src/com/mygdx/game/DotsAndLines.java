@@ -87,7 +87,7 @@ public class DotsAndLines {
     // creating circle points around center(X,Y) with radius
     //  from angle alpha to beta
     //  counterClockwise determines sense (independent of cut at angle=+/-PI)
-    public void addBasicArc(float centerX, float centerY, float radius,
+    public void addBasicArc(Vector2 center, float radius,
                                        float alpha, float beta, boolean counterClockwise) {
         if (counterClockwise) {
             if (beta < alpha) {
@@ -102,28 +102,37 @@ public class DotsAndLines {
         Gdx.app.log("nseg",""+nSegments);
         float deltaAngle=(beta-alpha)/nSegments;
         float angle=alpha;
-        Vector2 lastPoint=new Vector2(centerX+radius*MathUtils.cos(alpha),
-                                        centerY+radius*MathUtils.sin(alpha));
+        Vector2 lastPoint=new Vector2(center.x+radius*MathUtils.cos(alpha),
+                                        center.y+radius*MathUtils.sin(alpha));
+        Gdx.app.log("Startpoint",""+lastPoint);
         Vector2 nextPoint;
         for (int i=0;i<=nSegments;i++){
-            nextPoint=new Vector2(centerX+radius*MathUtils.cos(angle),
-                                    centerY+radius*MathUtils.sin(angle));
+            nextPoint=new Vector2(center.x+radius*MathUtils.cos(angle),
+                                    center.y+radius*MathUtils.sin(angle));
             angle+=deltaAngle;
             addLine(lastPoint,nextPoint);
             lastPoint=nextPoint;
         }
     }
 
-    public void addABSomeCenter(Vector2 a,Vector2 b,Vector2 someCenter,boolean counterclockwise){
+    public void addArcABSomeCenter(Vector2 a,Vector2 b,Vector2 someCenter,boolean counterclockwise){
         Vector2 unitACenter=new Vector2(someCenter).sub(a);
         unitACenter.scl(1f/unitACenter.len());
         Vector2 aB=new Vector2(b).sub(a);
         float radius=0.5f*aB.len2()/aB.dot(unitACenter);
         Vector2 center=new Vector2(a).mulAdd(unitACenter,radius);
+        Gdx.app.log("center",""+center);
         float alpha=MathUtils.atan2(a.y-center.y,a.x-center.x);
+        Gdx.app.log("alpha",""+alpha);
+        Gdx.app.log("radius",""+radius);
         float beta=MathUtils.atan2(b.y-center.y,b.x-center.x);
-        addBasicArc(center.x,center.y,radius,alpha,beta,counterclockwise);
+        addBasicArc(center,Math.abs(radius),alpha,beta,counterclockwise);
     }
 
+    public void addArcABTangent(Vector2 a,Vector2 b,Vector2 tangentPoint,boolean counterclockwise){
+        Vector2 someCenter=new Vector2(tangentPoint).sub(a).rotate90(0).add(a);
+        Gdx.app.log("",""+someCenter);
+        addArcABSomeCenter(a,b,someCenter,counterclockwise);
+    }
 
 }
