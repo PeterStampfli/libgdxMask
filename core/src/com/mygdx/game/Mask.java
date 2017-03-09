@@ -44,6 +44,14 @@ public class Mask {
         pixels.rewind();
     }
 
+    public Pixmap cutFromPixmap(Pixmap input,int offsetX,int offsetY){
+        Pixmap result=createPixmap();
+        result.drawPixmap(input,-offsetX,-offsetY);
+        setPixmapAlpha(result);
+
+        return result;
+    }
+
     public Vector2 getCenter(){
         int surface=0;
         int centerX=0;

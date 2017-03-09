@@ -135,4 +135,26 @@ public class DotsAndLines {
         addArcABSomeCenter(a,b,someCenter,counterclockwise);
     }
 
+
+    public void addArcABC(Vector2 a,Vector2 b,Vector2 c){
+        float a2mb2=(a.x-b.x)*(a.x+b.x)+(a.y-b.y)*(a.y+b.y);
+        float a2mc2=(a.x-c.x)*(a.x+c.x)+(a.y-c.y)*(a.y+c.y);
+        Gdx.app.log("a2mb2",""+a2mb2);
+        Gdx.app.log("a2mc2",""+a2mc2);
+        float den=2*((b.y-a.y)*(c.x-a.x)-(c.y-a.y)*(b.x-a.x));
+        Gdx.app.log("",""+den);
+        Vector2 center=new Vector2(((c.y-a.y)*a2mb2-(b.y-a.y)*a2mc2)/den,
+                                    -((c.x-a.x)*a2mb2-(b.x-a.x)*a2mc2)/den);
+        Gdx.app.log("center",center+" ");
+        float alpha=MathUtils.atan2(a.y-center.y,a.x-center.x);
+        float beta=MathUtils.atan2(b.y-center.y,b.x-center.x);
+        float gamma=MathUtils.atan2(c.y-center.y,c.x-center.x);
+        Gdx.app.log("alpha",""+alpha);
+        Gdx.app.log("beta",""+beta);
+        Gdx.app.log("gamma",""+gamma);
+        float radius=a.dst(center);
+        boolean counterClockwise=((alpha<beta)&&(beta<gamma))||((beta<gamma)&&(gamma<alpha))||((gamma<alpha)&&(alpha<beta));
+
+        addBasicArc(center,radius,alpha,gamma,counterClockwise);
+    }
 }
