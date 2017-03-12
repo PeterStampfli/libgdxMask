@@ -11,6 +11,9 @@ import java.nio.ByteBuffer;
  * Created by peter on 2/26/17.
  */
 
+// flip the y-axis !!!
+// to compensate for inverted y-axis in pixmaps
+
 public class Mask {
     public byte[] alpha;
     public int width;
@@ -27,6 +30,18 @@ public class Mask {
         iMax=width-1;
         jMin=0;
         jMax=height-1;
+    }
+
+    private int flipY(int y){
+        return height-1-y;
+    }
+
+    private float flipY(float y){
+        return height-1-y;
+    }
+
+    private void flipY(Vector2 point){
+        point.y=height-1-point.y;
     }
 
     public Pixmap createPixmap(){
@@ -48,7 +63,6 @@ public class Mask {
         Pixmap result=createPixmap();
         result.drawPixmap(input,-offsetX,-offsetY);
         setPixmapAlpha(result);
-
         return result;
     }
 
@@ -82,10 +96,12 @@ public class Mask {
     }
 
     public void setLimits(int iMin,int iMax,int jMin,int jMax){
-        this.iMin = MathUtils.clamp(iMin,0,width-1);
-        this.iMax = MathUtils.clamp(iMax,0,width-1);
-        this.jMin = MathUtils.clamp(jMin,0,height-1);
-        this.jMax = MathUtils.clamp(jMax,0,height-1);
+        jMin=flipY(jMin);
+        jMax=flipY(jMax);
+        this.iMin = MathUtils.clamp(Math.min(iMin,iMax),0,width-1);
+        this.iMax = MathUtils.clamp(Math.max(iMin,iMax),0,width-1);
+        this.jMin = MathUtils.clamp(Math.min(jMin,jMax),0,height-1);
+        this.jMax = MathUtils.clamp(Math.max(jMin,jMax),0,height-1);
     }
 
     public void setLimits(){
@@ -97,7 +113,7 @@ public class Mask {
     }
 
     // fill rect area
-    public void invertLimits(){
+    public void invertWithinLimits(){
         int i,j,jWidth;
         for (j=jMin;j<=jMax;j++) {
             jWidth = j * width;
@@ -124,9 +140,9 @@ public class Mask {
         return (byte) Math.max(iB,MathUtils.clamp(Math.floor(f*256),0,255));
     }
 
-
-    // smooth full disc
+    // smooth full disc, flip center y value
     public void disc(float centerX,float centerY,float radius){
+        centerY=flipY(centerY);
         int iMax,iMin,jMax,jMin;
         iMax=Math.min(this.iMax,MathUtils.ceil(centerX+radius));
         iMin=Math.max(this.iMin,MathUtils.floor(centerX-radius));
@@ -167,6 +183,7 @@ public class Mask {
     public void disc(Vector2 center,float radius){
         disc(center.x,center.y,radius);
     }
+
     // convex shapes
     private class Line{
         float pointX,pointY;
@@ -174,17 +191,20 @@ public class Mask {
         boolean isHorizontal;
         boolean increasing;
 
-        Line(Vector2 a,Vector2 b) {
-            pointX = a.x;
-            pointY = a.y;
-            isHorizontal = (Math.abs(b.x - a.x) > Math.abs(b.y - a.y));
+        // flip y-value, this inverts orientation
+        Line(float ax,float ay,float bx,float by) {
+            ay=flipY(ay);
+            by=flipY(by);
+            pointX = ax;
+            pointY = ay;
+            isHorizontal = (Math.abs(bx - ax) > Math.abs(by - ay));
             if (isHorizontal){
-                increasing = (b.x > a.x);
-                slope = (b.y - a.y) / (b.x - a.x);
+                increasing = (bx > ax);
+                slope = (by - ay) / (bx - ax);
             }
             else {
-                increasing=(b.y > a.y);
-                slope=(b.x-a.x)/(b.y-a.y);
+                increasing=(by > ay);
+                slope=(bx-ax)/(by-ay);
             }
         }
 
@@ -192,32 +212,23 @@ public class Mask {
             float linePosition,d;
             if (isHorizontal){
                 linePosition=pointY+slope*(i-pointX);
-                d=increasing?j-linePosition:linePosition-j;
+                d=increasing?linePosition-j:j-linePosition;
             }
             else {
                 linePosition=pointX+slope*(j-pointY);
-                d=increasing?linePosition-i:i-linePosition;
+                d=increasing?i-linePosition:linePosition-i;
             }
             return d+0.5f;
         }
     }
 
     public void fillShape(float... coordinates){
-        Array<Vector2> points=new Array<Vector2>();
-        int length=coordinates.length;
-        for (int i=0;i<length;i+=2){
-            points.add(new Vector2(coordinates[i],coordinates[i+1]));
-        }
-        fillShape(points);
-    }
-
-    public void fillShape(Array<Vector2> points){
+        int length=coordinates.length-2;
         Array<Line> lines=new Array<Line>();
-        int length=points.size;
-        for (int i=0;i<length-1;i++){
-            lines.add(new Line(points.get(i),points.get(i+1)));
+        for (int i=0;i<length;i+=2) {
+            lines.add(new Line(coordinates[i],coordinates[i+1],coordinates[i+2],coordinates[i+3]));
         }
-        lines.add(new Line(points.get(length-1),points.get(0)));
+        lines.add(new Line(coordinates[length],coordinates[length+1],coordinates[0],coordinates[1]));
         int i,j,jWidth;
         float d;
         length=lines.size;
@@ -236,6 +247,11 @@ public class Mask {
                 }
             }
         }
+
+    }
+
+    public void fillShape(Array<Vector2> points){
+        fillShape(Vector2Array.toFloats(points));
     }
 
     public void fillLine(float x1,float y1,float x2,float y2,float halfWidth){
