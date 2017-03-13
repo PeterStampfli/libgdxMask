@@ -30,7 +30,7 @@ public class DotsAndLines {
     public void drawDotsAndLines(Mask mask,float width){
         float halfWidth=0.5f*width;
         for (Vector2 point:points){
-            mask.disc(point,halfWidth);
+            mask.fillCircle(point,halfWidth);
         }
         for (Line line:lines){
             mask.fillLine(line.a,line.b,halfWidth);
@@ -38,7 +38,7 @@ public class DotsAndLines {
     }
 
     public void fillShape(Mask mask){
-        mask.fillShape(points);
+        mask.fillPolygon(points);
     }
 
     private class Line{
@@ -84,7 +84,7 @@ public class DotsAndLines {
         }
     }
 
-    // creating circle points around center(X,Y) with radius
+    // creating fillCircle points around center(X,Y) with radius
     //  from angle alpha to beta
     //  counterClockwise determines sense (independent of cut at angle=+/-PI)
     public void addBasicArc(Vector2 center, float radius,

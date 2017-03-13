@@ -1,7 +1,12 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -121,15 +126,26 @@ public class Mask {
     }
 
     // fill rect area
-    public void fillLimits(){
+    public void fillRect(int ic,int jc,int rectWidth,int rectHeight){
+        int iMx=Math.min(this.iMax,ic+rectWidth-1);
+        int iMn=Math.max(this.iMin,ic);
+        int jMx=Math.min(this.jMax,flipY(jc));
+        int jMn=Math.max(this.jMin,flipY(jc)-rectHeight+1);
         int i,j,jWidth;
-        for (j=jMin;j<=jMax;j++) {
+        for (j=jMn;j<=jMx;j++) {
             jWidth = j * width;
-            for (i = iMin; i <= iMax; i++) {
+            for (i = iMn; i <= iMx; i++) {
                 alpha[i + jWidth] = (byte) 255;
             }
         }
     }
+
+    public void fillRect(Rectangle rectangle){
+        fillRect(Math.round(rectangle.x),Math.round(rectangle.y),
+                Math.round(rectangle.width),Math.round(rectangle.height));
+    }
+
+
 
     public byte maxByteFloat(byte b,float f){
         int iB=b;
@@ -138,7 +154,7 @@ public class Mask {
     }
 
     // smooth full disc, flip center y value
-    public void circle(float centerX,float centerY,float radius){
+    public void fillCircle(float centerX, float centerY, float radius){
         centerY=flipY(centerY);
         int iMax,iMin,jMax,jMin;
         iMax=Math.min(this.iMax,MathUtils.ceil(centerX+radius));
@@ -177,8 +193,12 @@ public class Mask {
         }
     }
 
-    public void circle(Vector2 center,float radius){
-        circle(center.x,center.y,radius);
+    public void fillCircle(Vector2 center, float radius){
+        fillCircle(center.x,center.y,radius);
+    }
+
+    public void fillCircle(Circle circle){
+        fillCircle(circle.x,circle.y,circle.radius);
     }
 
     // convex shapes
@@ -219,7 +239,7 @@ public class Mask {
         }
     }
 
-    public void fillShape(float... coordinates){
+    public void fillPolygon(float... coordinates){
         int length=coordinates.length-2;
         Array<Line> lines=new Array<Line>();
         for (int i=0;i<length;i+=2) {
@@ -247,15 +267,40 @@ public class Mask {
 
     }
 
-    public void fillShape(Array<Vector2> points){
-        fillShape(Vector2Array.toFloats(points));
+    public void fillPolygon(Array<Vector2> points){
+        fillPolygon(Vector2Array.toFloats(points));
+    }
+
+    public void fillPolygon(Polygon polygon){
+        fillPolygon(polygon.getVertices());
+    }
+
+    public void fill(Shape2D shape){
+        if (shape.getClass()==Polygon.class){
+            fillPolygon((Polygon)shape);
+        }
+        else if (shape.getClass()==Circle.class){
+            fillCircle((Circle) shape);
+        }
+        else if(shape.getClass()==Rectangle.class){
+            fillRect((Rectangle) shape);
+        }
+        else if (shape.getClass()==Shapes2D.class){
+            Shapes2D shapes=(Shapes2D) shape;
+            for (Shape2D subShape:shapes.shapes){
+                fill(subShape);
+            }
+        }
+        else {
+            Gdx.app.log(" ******************** mask","unknown shape "+shape.getClass());
+        }
     }
 
     public void fillLine(float x1,float y1,float x2,float y2,float halfWidth){
         float length=(float) Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
         float ex=(x2-x1)/length*halfWidth;
         float ey=(y2-y1)/length*halfWidth;
-        fillShape(x1+ey,y1-ex,x2+ey,y2-ex,x2-ey,y2+ex,x1-ey,y1+ex);
+        fillPolygon(x1+ey,y1-ex,x2+ey,y2-ex,x2-ey,y2+ex,x1-ey,y1+ex);
     }
 
     public void fillLine(Vector2 a,Vector2 b,float halfWidth){
