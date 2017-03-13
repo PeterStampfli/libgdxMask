@@ -26,10 +26,7 @@ public class Mask {
         this.height=height;
         alpha=new byte[width*height];
         clear();
-        iMin=0;
-        iMax=width-1;
-        jMin=0;
-        jMax=height-1;
+        setLimits();                                            // transparent border
     }
 
     private int flipY(int y){
@@ -109,7 +106,7 @@ public class Mask {
     }
 
     public void noLimits(){
-        setLimits(0,width,0,height);
+        setLimits(0,width-1,0,height-1);
     }
 
     // fill rect area
@@ -141,7 +138,7 @@ public class Mask {
     }
 
     // smooth full disc, flip center y value
-    public void disc(float centerX,float centerY,float radius){
+    public void circle(float centerX,float centerY,float radius){
         centerY=flipY(centerY);
         int iMax,iMin,jMax,jMin;
         iMax=Math.min(this.iMax,MathUtils.ceil(centerX+radius));
@@ -180,8 +177,8 @@ public class Mask {
         }
     }
 
-    public void disc(Vector2 center,float radius){
-        disc(center.x,center.y,radius);
+    public void circle(Vector2 center,float radius){
+        circle(center.x,center.y,radius);
     }
 
     // convex shapes
