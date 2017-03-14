@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 import static com.badlogic.gdx.Gdx.input;
@@ -10,7 +11,7 @@ import static com.badlogic.gdx.Gdx.input;
  * Created by peter on 11/26/16.
  */
 
-public class TouchPiece {
+public class PieceInteraction {
 
     private UserInteraction userInteraction;
     private AbstractPiece piece;
@@ -28,10 +29,10 @@ public class TouchPiece {
     /**
      * create a touch handler
      *
-     * @param piece       object,its rendering, selection and moving methods get called, 
+     * @param piece       object,its rendering, selection and moving methods get called,
      * @param userInteraction object for reading touch touchPosition, depends on camera
      */
-    public TouchPiece(AbstractPiece piece, UserInteraction userInteraction) {
+    public PieceInteraction(AbstractPiece piece, UserInteraction userInteraction) {
         this.piece = piece;
         elementIsSelected = false;
         wasTouching = false;
@@ -71,7 +72,6 @@ public class TouchPiece {
         return piece.touchEnd();
     }
 
-
     /**
      * update touch data and call events
      * make sure all touchPosition data is well defined, even when not used
@@ -104,7 +104,16 @@ public class TouchPiece {
         wasTouching = isTouching;
 
         if (somethingHappened) {
-          //  Basic.requestRendering();
+            Basic.requestRendering();
         }
     }
+
+    /**
+     * render the piece(collection)
+     * @param batch
+     */
+    public void render(SpriteBatch batch){
+        piece.render(batch);
+    }
+
 }

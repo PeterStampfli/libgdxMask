@@ -17,7 +17,7 @@ public class Piece extends SpriteWithShape implements Shape2D,AbstractPiece {
 
     @Override
     public void render(SpriteBatch batch) {
-
+        draw(batch);
     }
 
     @Override
@@ -27,7 +27,8 @@ public class Piece extends SpriteWithShape implements Shape2D,AbstractPiece {
 
     @Override
     public boolean touchDrag(Vector2 position, Vector2 deltaPosition) {
-        return false;
+        translate(deltaPosition.x,deltaPosition.y);
+        return true;
     }
 
     @Override

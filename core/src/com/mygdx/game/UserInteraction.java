@@ -96,7 +96,7 @@ public class UserInteraction {
     /**
      * update orientation and mouse accelerometer scales at resize
      */
-    public void update(int width,int height){
+    public void resize(int width,int height){
         mouseAccelerometerScale =2* mouseAccelerometerMax /Math.min(width, height);
         screenWidth2=width/2;
         screenHeight2=height/2;
@@ -118,7 +118,7 @@ public class UserInteraction {
      */
     public void readTouch(Vector2 vector){
         spacePositionOfTouch.set(getXLimited(),getYLimited(),0f);
- //       Logger.log("Spacex "+spacePositionOfTouch);
+ //       L.log("Spacex "+spacePositionOfTouch);
         camera.unproject(spacePositionOfTouch);
         vector.set(spacePositionOfTouch.x,spacePositionOfTouch.y);
     }

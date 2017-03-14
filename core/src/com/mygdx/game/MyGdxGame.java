@@ -27,6 +27,8 @@ public class MyGdxGame extends ApplicationAdapter {
 	OrthographicCamera camera;
 	ShapeRenderer shapeRenderer;
 	UserInteraction userInteraction;
+	Piece piece;
+	PieceInteraction pieceInteraction;
 	
 	@Override
 	public void create () {
@@ -93,40 +95,37 @@ public class MyGdxGame extends ApplicationAdapter {
 		sprite.setX(100);
 		sprite.setY(200);
 		//sprite.setRotation(80);
-
+		 piece=new Piece(img,shapes);
+		pieceInteraction=new PieceInteraction(piece,userInteraction);
 
 	}
 
 	@Override
 	public void resize(int width,int height) {
 		camera.setToOrtho(false);
+		userInteraction.resize(width, height);
 	}
 
 	@Override
 	public void render () {
+		pieceInteraction.update();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		sprite.setColor(Color.WHITE);
 		Vector3 spacePositionOfTouch=new Vector3(Gdx.input.getX(),Gdx.input.getY(),0);
-		//       Logger.log("Spacex "+spacePositionOfTouch);
+		//       L.log("Spacex "+spacePositionOfTouch);
 		camera.unproject(spacePositionOfTouch);
-
-		if (sprite.contains(spacePositionOfTouch.x,spacePositionOfTouch.y)){
-			sprite.setColor(Color.GREEN);
+		piece.setColor(Color.WHITE);
+		if (piece.contains(spacePositionOfTouch.x,spacePositionOfTouch.y)){
+			piece.setColor(Color.GREEN);
 		}
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		//batch.draw(img, 0, 0,400,400);
-		sprite.draw(batch);
+		//sprite.draw(batch);
+		pieceInteraction.render(batch);
 		batch.end();
-		shapeRenderer.setProjectionMatrix(camera.combined);
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-		shapeRenderer.setColor(Color.YELLOW);
-		shapeRenderer.circle(sprite.getX(),sprite.getY(),5);
-		shapeRenderer.setColor(Color.ORANGE);
-		shapeRenderer.circle(sprite.getX()+sprite.getOriginX(),sprite.getY()+sprite.getOriginY(),7);
 
-		shapeRenderer.end();
 	}
 	
 	@Override
