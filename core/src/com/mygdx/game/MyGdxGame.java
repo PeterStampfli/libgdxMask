@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -27,12 +26,14 @@ public class MyGdxGame extends ApplicationAdapter {
 	SpriteWithShape sprite;
 	OrthographicCamera camera;
 	ShapeRenderer shapeRenderer;
+	UserInteraction userInteraction;
 	
 	@Override
 	public void create () {
 		camera=new OrthographicCamera();
 		batch = new SpriteBatch();
 		shapeRenderer=new ShapeRenderer();
+		userInteraction=new UserInteraction(camera);
 		FileHandle bad=Gdx.files.internal("badlogic.jpg");
 
 		Pixmap badmap=new Pixmap(bad);
@@ -42,14 +43,6 @@ public class MyGdxGame extends ApplicationAdapter {
 		Pixmap rgba=mask.createPixmap();
 		rgba.setColor(Color.WHITE);
 		rgba.fill();
-		//mask.setLimits(1,48,1,48);
-	//	mask.disc(20f,40f,10);
-		//mask.fillLine(20f,20f,20,40,10);
-		//mask.setLimits();
-
-		//mask.fillPolygon(10,10,40,20,30,49,-10,20);
-		//mask.fillPolygon(40,20,140,40,30,249,30,49);
-		//mask.invertLimits();
 
 		//mask.fillLine(2,2,49,40,6);
 		DotsAndLines dotsAndLines=new DotsAndLines();
@@ -90,7 +83,6 @@ public class MyGdxGame extends ApplicationAdapter {
 		mask.setPixmapAlpha(rgba);
 
 		img = new Texture(rgba);
-		//img = new Texture(badmap);
 		rgba.dispose();
 
 		img.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -98,15 +90,11 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		sprite=new SpriteWithShape(img,shapes);
 
-		Vector2[] vertices=new Vector2[]{a,b,t};
-		//shapes.addPolygon(triangle);
-
 		sprite.setX(100);
 		sprite.setY(200);
 		//sprite.setRotation(80);
 
-		Polyline polyline=new Polyline();
-		mask.fill(polyline);
+
 	}
 
 	@Override
