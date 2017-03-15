@@ -201,7 +201,7 @@ public class Mask {
         fillCircle(circle.x,circle.y,circle.radius);
     }
 
-    // convex shapes
+    // convex shape2DArray
     private class Line{
         float pointX,pointY;
         float slope;
@@ -287,7 +287,7 @@ public class Mask {
         }
         else if (shape.getClass()==Shapes2D.class){
             Shapes2D shapes=(Shapes2D) shape;
-            for (Shape2D subShape:shapes.shapes){
+            for (Shape2D subShape:shapes.shape2DArray){
                 fill(subShape);
             }
         }

@@ -17,18 +17,17 @@ public class Basic {
 
     /**
      * switch continuous rendering
+     *    input events trigger rendering!
      *
      * @param on true for continuous rendering
      */
     public static void setContinuousRendering(boolean on) {
         Gdx.graphics.setContinuousRendering(on);
-        if (!on) {
-            requestRendering();
-        }
     }
 
     /**
      * demand call to renderFrame
+     *   maybe not needed if input event already triggers rendering
      */
     public static void requestRendering() {
         Gdx.graphics.requestRendering();

@@ -12,12 +12,12 @@ import com.badlogic.gdx.utils.Array;
  */
 
 public class Shapes2D implements Shape2D {
-    Array<Shape2D>shapes=new Array<Shape2D>();
+    Array<Shape2D> shape2DArray =new Array<Shape2D>();
 
     @Override
     public boolean contains(float x, float y){
         boolean result=false;
-        for (Shape2D shape:shapes){
+        for (Shape2D shape: shape2DArray){
             result=result||shape.contains(x, y);
         }
         return result;
@@ -30,7 +30,7 @@ public class Shapes2D implements Shape2D {
     }
 
     public void add(Shape2D shape2D){
-        shapes.add(shape2D);
+        shape2DArray.add(shape2D);
     }
 
     public void addPolygon(float[] verticesXY){

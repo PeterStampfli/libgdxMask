@@ -22,17 +22,19 @@ public class Piece extends SpriteWithShape implements Shape2D,AbstractPiece {
 
     @Override
     public boolean touchBegin(Vector2 position) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean touchDrag(Vector2 position, Vector2 deltaPosition) {
-        translate(deltaPosition.x,deltaPosition.y);
+        //translate(deltaPosition);
+        transRotate(position,deltaPosition);
         return true;
     }
 
     @Override
     public boolean touchEnd() {
-        return false;
+        quantizeRotation(6);
+        return true;
     }
 }

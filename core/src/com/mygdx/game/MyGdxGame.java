@@ -65,13 +65,13 @@ public class MyGdxGame extends ApplicationAdapter {
 		triangle.add(b);
 		triangle.add(t);
 		//mask.fillPolygon(triangle);
-		mask.noLimits();
+		//mask.noLimits();
 		Polygon polygon= Shapes2D.createPolygon(triangle);
 		Circle circle=new Circle(10,30,5);
-		Rectangle rectangle=new Rectangle(0,0,80,30);
+		Rectangle rectangle=new Rectangle(1,1,98,98);
 		Shapes2D shapes=new Shapes2D();
-		//shapes.add(polygon);
-		//shapes.add(circle);
+		//shape2DArray.add(polygon);
+		//shape2DArray.add(circle);
 		shapes.add(rectangle);
 		//mask.fillCircle(circle);
 		//mask.invertWithinLimits();
@@ -82,7 +82,6 @@ public class MyGdxGame extends ApplicationAdapter {
 		mask.setPixmapAlpha(rgba);
 
 		//rgba=mask.cutFromPixmap(badmap,10,50);
-		mask.setPixmapAlpha(rgba);
 
 		img = new Texture(rgba);
 		rgba.dispose();
@@ -96,7 +95,9 @@ public class MyGdxGame extends ApplicationAdapter {
 		sprite.setY(200);
 		//sprite.setRotation(80);
 		 piece=new Piece(img,shapes);
-		pieceInteraction=new PieceInteraction(piece,userInteraction);
+		Pieces pieces=new Pieces();
+		pieces.add(piece);
+		pieceInteraction=new PieceInteraction(pieces,userInteraction);
 
 	}
 
@@ -108,6 +109,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+		Basic.setContinuousRendering(false);
 		pieceInteraction.update();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
